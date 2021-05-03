@@ -73,7 +73,8 @@ do -- Battery Widget
 
     local worker = function(widget, stdout)
       awful.spawn.easy_async_with_shell('acpi', function(out)
-        widget.state = out
+        local _, _, val = string.find(out, '(.+)\n')
+        widget.state = val
       end)
 
       if not widget.maxcharge then

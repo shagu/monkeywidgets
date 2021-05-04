@@ -159,12 +159,27 @@ do -- Wifi Widget
         local _, _, freq = string.find(stdout, "Frequency:(.+)GHz.+")
 
         if tonumber(current) and tonumber(max) then
-          widget.bar.value = current / max
+          local value = current / max * 100
+
+          if value < .2 then
+            widget.img:set_image(assets..'wifi-0.png')
+          elseif value < .4 then
+            widget.img:set_image(assets..'wifi-1.png')
+          elseif value < .6 then
+            widget.img:set_image(assets..'wifi-2.png')
+          elseif value < .8 then
+            widget.img:set_image(assets..'wifi-3.png')
+          elseif value then
+            widget.img:set_image(assets..'wifi-4.png')
+          end
 
           freq = freq or "N/A"
           essid = essid or "N/A"
 
           widget.state = 'WiFi: <b>'..essid ..'</b> ('..freq..'GHz)\nQuality: '.. current..'/'.. max..' ('..math.floor(current / max * 100 + .5)..'%)'
+          widget.bar.value = value
+        else
+          widget.img:set_image(assets..'wifi-off.png')
         end
       end
 

@@ -51,6 +51,7 @@ do -- Core Widget Library
     end
 
     widget.icon = icon
+    widget.img = img
     widget.bar = bar
     widget.bg = bg
 
@@ -189,31 +190,40 @@ do -- Volume Widget (PulseAudio)
     local command = 'pamixer --get-volume'
 
     local worker = function(widget, stdout)
-      local _, _, val = string.find(stdout, '(.+)\n')
+      local _, _, vol = string.find(stdout, '(.+)\n')
 
       awful.spawn.easy_async_with_shell('pamixer --get-mute', function(out)
-        local _, _, val = string.find(out, '(.+)\n')
-        widget.mute = val ~= "false" and "Muted"
+        local _, _, mute = string.find(out, '(.+)\n')
+        widget.mute = mute ~= "false" and "Muted"
+
+        if widget and widget.mute then
+          widget.img:set_image(assets..'vol-mute.png')
+        elseif vol and tonumber(vol) then
+          if tonumber(vol) < 30 then
+            widget.img:set_image(assets..'vol-0.png')
+          elseif tonumber(vol) < 60 then
+            widget.img:set_image(assets..'vol-1.png')
+          else
+            widget.img:set_image(assets..'vol-2.png')
+          end
+        end
       end)
 
-      widget.state = val
-      widget.bar.value = val / 100
+      widget.state = vol
+      widget.bar.value = vol / 100
     end
 
     local buttons = awful.util.table.join(
       awful.button({ }, 1, function (s)
-        awful.spawn.easy_async("pamixer -t")
-        widget.refresh()
+        awful.spawn.easy_async("pamixer -t", widget.refresh)
       end),
 
       awful.button({ }, 4, function (s)
-        awful.spawn.easy_async("pamixer -i 5")
-        widget.refresh()
+        awful.spawn.easy_async("pamixer -i 2", widget.refresh)
       end),
 
       awful.button({ }, 5, function (s)
-        awful.spawn.easy_async("pamixer -d 5")
-        widget.refresh()
+        awful.spawn.easy_async("pamixer -d 2", widget.refresh)
       end)
     )
 

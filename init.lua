@@ -4,6 +4,7 @@ local widgets = {}
 local wibox = require("wibox")
 local gears = require("gears")
 local awful = require("awful")
+local assets = os.getenv("HOME") .. "/.config/awesome/monkeywidgets/icons/"
 
 do -- Configuration
   widgets.width = 10
@@ -19,7 +20,6 @@ end
 
 do -- Core Widget Library
   widgets.create = function(icon, cmd, timer, callback, buttons, tooltip)
-    local assets = os.getenv("HOME") .. "/.config/awesome/monkeywidgets/icons/"
     local img = wibox.widget.imagebox(assets .. icon)
     local icon = wibox.container.margin(img, 4, 4, 6, 6)
 

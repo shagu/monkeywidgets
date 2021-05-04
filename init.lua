@@ -78,6 +78,11 @@ do -- Battery Widget
         widget.state = val:gsub("%%, ", "%%\n")
       end)
 
+      awful.spawn.easy_async_with_shell('cat /sys/class/power_supply/'..bat..'/status', function(out)
+        local _, _, val = string.find(out, '(.+)\n')
+        widget.charging = val == 'Charging' and true or nil
+      end)
+
       if not widget.maxcharge then
         awful.spawn.easy_async_with_shell('cat /sys/class/power_supply/'..bat..'/energy_full', function(out)
           widget.maxcharge = out
@@ -86,7 +91,29 @@ do -- Battery Widget
       end
 
       if tonumber(widget.maxcharge) and tonumber(stdout) then
-        widget.bar.value = stdout / widget.maxcharge
+        local value = stdout / widget.maxcharge
+
+        if widget.charging then
+          widget.img:set_image(assets..'bat-ac.png')
+        elseif value < .1 then
+          widget.img:set_image(assets..'bat-0.png')
+        elseif value < .2 then
+          widget.img:set_image(assets..'bat-20.png')
+        elseif value < .3 then
+          widget.img:set_image(assets..'bat-30.png')
+        elseif value < .5 then
+          widget.img:set_image(assets..'bat-50.png')
+        elseif value < .6 then
+          widget.img:set_image(assets..'bat-60.png')
+        elseif value < .8 then
+          widget.img:set_image(assets..'bat-80.png')
+        elseif value < .9 then
+          widget.img:set_image(assets..'bat-90.png')
+        elseif value then
+          widget.img:set_image(assets..'bat-100.png')
+        end
+
+        widget.bar.value = value
       end
     end
 
@@ -96,7 +123,7 @@ do -- Battery Widget
       return widget.state
     end
 
-    widget = widgets.create('bat-0.png', command, 10, worker, buttons, tooltip)
+    widget = widgets.create('bat-0.png', command, 1, worker, buttons, tooltip)
 
     return widget
   end

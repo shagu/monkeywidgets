@@ -10,6 +10,7 @@ This system is made purely by my own preferences and might not work for you (wit
 - Volume (pulse)
 - Backlight
 - WiFi
+- Nightlight
 
 ## Install
 
@@ -23,6 +24,7 @@ Some modules require system tools to be installed in order to query and/or set s
 - volume: `pacmd`
 - backlight: `backlightctl`
 - wifi: `wireless_tools` (iwconfig)
+- night: `xorg-xrandr`
 
 ## Usage
 

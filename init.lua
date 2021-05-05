@@ -279,4 +279,85 @@ do -- Volume Widget (PulseAudio)
   end
 end
 
+do -- Nightlight (xgamma)
+  local gamma = {
+    [0]  = {1, 1.00000000, 1.00000000, "6500K"},
+    [1]  = {1, 0.98553719, 0.97152992, "6250K"},
+    [2]  = {1, 0.97107439, 0.94305985, "6000K"},
+    [3]  = {1, 0.97107439, 0.94305985, "6000K"},
+    [4]  = {1, 0.95480712, 0.91218221, "5750K"},
+    [5]  = {1, 0.93853986, 0.88130458, "5500K"},
+    [6]  = {1, 0.90198230, 0.81465502, "5000K"},
+    [7]  = {1, 0.88529467, 0.77577149, "4750K"},
+    [8]  = {1, 0.86860704, 0.73688797, "4500K"},
+    [9]  = {1, 0.84857745, 0.69252683, "4250K"},
+    [10] = {1, 0.82854786, 0.64816570, "4000K"},
+  }
+
+  widgets.night = function(display, def)
+    local widget
+    local setgamma = 'xrandr --output %s --gamma %s:%s:%s'
+
+    local command = 'echo'   -- todo: a float query of xrandr gamma
+    local default = def or 4 -- fallback to '5750K'
+
+    local worker = function(widget, stdout)
+      widget.gamma = widget.gamma or 0
+
+      widget.state = gamma[widget.gamma][4]
+      widget.bar.value = widget.gamma / 10
+    end
+
+    local buttons = awful.util.table.join(
+      awful.button({ }, 1, function (s)
+        if widget.gamma > 0 then
+          widget.gamma = 0
+          local r = gamma[0][1]
+          local g = gamma[0][2]
+          local b = gamma[0][3]
+
+          awful.spawn.easy_async(string.format(setgamma, display, r, g, b), widget.refresh)
+        else
+          widget.gamma = default
+          local r = gamma[default][1]
+          local g = gamma[default][2]
+          local b = gamma[default][3]
+
+          awful.spawn.easy_async(string.format(setgamma, display, r, g, b), widget.refresh)
+        end
+      end),
+
+      awful.button({ }, 4, function (s)
+        widget.gamma = widget.gamma + 1
+        widget.gamma = widget.gamma > 10 and 10 or widget.gamma
+
+        local r = gamma[widget.gamma][1]
+        local g = gamma[widget.gamma][2]
+        local b = gamma[widget.gamma][3]
+
+        awful.spawn.easy_async(string.format(setgamma, display, r, g, b), widget.refresh)
+      end),
+
+      awful.button({ }, 5, function (s)
+        widget.gamma = widget.gamma - 1
+        widget.gamma = widget.gamma < 0 and 0 or widget.gamma
+
+        local r = gamma[widget.gamma][1]
+        local g = gamma[widget.gamma][2]
+        local b = gamma[widget.gamma][3]
+
+        awful.spawn.easy_async(string.format(setgamma, display, r, g, b), widget.refresh)
+      end)
+    )
+
+    local tooltip = function()
+      return 'Color Temperature: ' .. widget.state
+    end
+
+    widget = widgets.create('night.png', command, 1, worker, buttons, tooltip)
+
+    return widget
+  end
+end
+
 return widgets

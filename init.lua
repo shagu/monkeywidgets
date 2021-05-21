@@ -75,12 +75,12 @@ do -- Battery Widget
     local worker = function(widget, stdout)
       awful.spawn.easy_async_with_shell('acpi', function(out)
         local _, _, val = string.find(out, '(.+)\n')
-        widget.state = val:gsub("%%, ", "%%\n")
+        if val then widget.state = val:gsub("%%, ", "%%\n") end
       end)
 
       awful.spawn.easy_async_with_shell('cat /sys/class/power_supply/'..bat..'/status', function(out)
         local _, _, val = string.find(out, '(.+)\n')
-        widget.charging = val == 'Charging' and true or nil
+        if val then widget.charging = val == 'Charging' and true or nil end
       end)
 
       if not widget.maxcharge then

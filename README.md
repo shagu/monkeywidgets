@@ -22,7 +22,7 @@ Some modules require system tools to be installed in order to query and/or set s
 
 - battery: `acpi`
 - volume: `pacmd`
-- backlight: `backlightctl`
+- backlight: `brightnessctl`
 - wifi: `wireless_tools` (iwconfig)
 - night: `xorg-xrandr`
 

@@ -296,7 +296,18 @@ do -- Nightlight (xgamma)
 
   widgets.night = function(display, def)
     local widget
-    local setgamma = 'xrandr --output %s --gamma %s:%s:%s'
+
+    -- allow to run multiple displays
+    local pattern = 'xrandr --output %s --gamma %s:%s:%s'
+    local function setgamma(output, r, g, b, callback)
+      if type(output) == "table" then
+        for id, out in pairs(display) do
+          setgamma(out, r, g, b, callback)
+        end
+      else
+        awful.spawn.easy_async(string.format(pattern, output, r, g, b), callback)
+      end
+    end
 
     local command = 'echo'   -- todo: a float query of xrandr gamma
     local default = def or 4 -- fallback to '5750K'
@@ -315,15 +326,13 @@ do -- Nightlight (xgamma)
           local r = gamma[0][1]
           local g = gamma[0][2]
           local b = gamma[0][3]
-
-          awful.spawn.easy_async(string.format(setgamma, display, r, g, b), widget.refresh)
+          setgamma(display, r, g, b, widget.refresh)
         else
           widget.gamma = default
           local r = gamma[default][1]
           local g = gamma[default][2]
           local b = gamma[default][3]
-
-          awful.spawn.easy_async(string.format(setgamma, display, r, g, b), widget.refresh)
+          setgamma(display, r, g, b, widget.refresh)
         end
       end),
 
@@ -334,8 +343,7 @@ do -- Nightlight (xgamma)
         local r = gamma[widget.gamma][1]
         local g = gamma[widget.gamma][2]
         local b = gamma[widget.gamma][3]
-
-        awful.spawn.easy_async(string.format(setgamma, display, r, g, b), widget.refresh)
+        setgamma(display, r, g, b, widget.refresh)
       end),
 
       awful.button({ }, 5, function (s)
@@ -345,8 +353,7 @@ do -- Nightlight (xgamma)
         local r = gamma[widget.gamma][1]
         local g = gamma[widget.gamma][2]
         local b = gamma[widget.gamma][3]
-
-        awful.spawn.easy_async(string.format(setgamma, display, r, g, b), widget.refresh)
+        setgamma(display, r, g, b, widget.refresh)
       end)
     )
 

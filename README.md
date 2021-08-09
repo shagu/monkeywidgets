@@ -21,7 +21,7 @@ This system is made purely by my own preferences and might not work for you (wit
 Some modules require system tools to be installed in order to query and/or set specific values.
 
 - battery: `acpi`
-- volume: `pacmd`
+- volume: `pamixer`
 - backlight: `brightnessctl`
 - wifi: `wireless_tools` (iwconfig)
 - night: `xorg-xrandr`
